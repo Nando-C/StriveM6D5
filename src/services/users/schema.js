@@ -25,4 +25,14 @@ const UserSchema = new Schema (
     }
 )
 
+UserSchema.static('findUsers', async function (query) {
+    const total = await this.countDocuments(query.criteria)
+    const users = await this.find(query.criteria, query.options.fields)
+        .skip(query.options.skip)
+        .limit(query.options.limit)
+        .sort(query.options.sort)
+
+    return { total, users }
+})
+
 export default model('User', UserSchema)
