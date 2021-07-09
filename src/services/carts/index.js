@@ -32,7 +32,27 @@ cartsRouter.post('/:ownerId/addProduct', async (req, res, next) => {
         }
     } catch (error) {
         console.log(error)
-        next(createError(500, "An Error ocurred while creating a new cart"))
+        next(createError(500, "An Error ocurred while adding product to cart"))
+    }
+})
+
+// ===============  REMOVES PRODUCT FROM CART  =======================
+cartsRouter.delete('/:ownerId/removeProduct', async (req, res, next) => {
+    try {
+        const productId = req.body._id
+        const isProductThere = await CartModel.findOne({ownerId: req.params.ownerId, status: 'active', 'products._id': productId})
+
+        if (isProductThere) {
+            const cart = await CartModel.findOneAndUpdate({ownerId: req.params.ownerId, status: 'active', 'products._id': productId}, { $pull: { products: { _id: productId } }}, { new: true })
+
+            res.send(cart)
+        } else {
+            next(createError(404, `Product with _id ${productId} Not Found in cart!`))
+        }
+
+    } catch (error) {
+        console.log(error)
+        next(createError(500, "An Error ocurred while removing a new cart"))
     }
 })
 

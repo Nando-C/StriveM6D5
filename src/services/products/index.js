@@ -56,13 +56,13 @@ productsRouter.get('/:productId', async (req, res, next) => {
 productsRouter.put('/:productId', async (req, res, next) => {
     try {
         const productId = req.params.productId
-        const modifiedproduct = await ProductModel.findByIdAndUpdate(productId, req.body, {
+        const modifiedProduct = await ProductModel.findByIdAndUpdate(productId, req.body, {
             new: true,
             runValidators: true,
         } )
 
-        if(modifiedproduct) {
-            res.send(modifiedproduct)
+        if(modifiedProduct) {
+            res.send(modifiedProduct)
         } else {
             next(createError(404, `Product with _id ${productId} Not Found!`))
         }
@@ -75,9 +75,9 @@ productsRouter.put('/:productId', async (req, res, next) => {
 productsRouter.delete('/:productId', async (req, res, next) => {
     try {
         const productId = req.params.productId
-        const deletedproduct = await ProductModel.findByIdAndDelete(productId)
+        const deletedProduct = await ProductModel.findByIdAndDelete(productId)
 
-        if (deletedproduct) {
+        if (deletedProduct) {
             res.status(204).send()
         } else {
             next(createError(404, `Product with _id ${productId} Not Found!`))
