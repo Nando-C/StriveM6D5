@@ -6,9 +6,11 @@ import CartModel from './schema.js'
 const cartsRouter = express.Router()
 
 // ===============  ADDS PRODUCT TO CART / INCREMENTS QUANTITY IF ALREADY THERE  =======================
+// receives productId & quantity in the body of the request
+
 cartsRouter.post('/:ownerId/addProduct', async (req, res, next) => {
     try {
-        const productId = req.body.productId
+        const productId = req.body._id
         const purchasedProduct = await ProductModel.findById(productId)
 
         if( purchasedProduct) {
