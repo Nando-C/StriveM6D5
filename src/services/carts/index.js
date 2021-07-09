@@ -56,4 +56,18 @@ cartsRouter.delete('/:ownerId/removeProduct', async (req, res, next) => {
     }
 })
 
+// ===============  RETURNS AN USER'S CART  =======================
+cartsRouter.get('/:ownerId', async (req, res, next) => {
+    try {
+        const cart = await CartModel.findOne({ownerId: req.params.ownerId})
+        if(cart) {
+            res.send(cart)
+        } else {
+            next(createError(404, `Cart Not Found!`))
+        }
+    } catch (error) {
+        console.log(error)
+        next(createError(500, "An Error ocurred while getting the user's cart's products"))
+    }
+})
 export default cartsRouter
