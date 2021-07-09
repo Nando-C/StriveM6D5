@@ -28,7 +28,7 @@ const ProductSchema = new Schema (
             type: String,
             required: true
         },
-        comments: [
+        reviews: [
             {
                 comment: {
                     type: String,
@@ -39,7 +39,8 @@ const ProductSchema = new Schema (
                     required: true,
                     min: 1,
                     max: 5,
-                }
+                },
+                createdAt: Date,
             }
         ]
     },

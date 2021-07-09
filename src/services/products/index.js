@@ -88,17 +88,17 @@ productsRouter.delete('/:productId', async (req, res, next) => {
 })
 
 // *****************************************************************************
-//                                 COMMENTS
+//                                 REVIEWS
 // *****************************************************************************
 
-// =========  CREATES A NEW COMMENT ON A PRODUCT =============
+// =========  CREATES A NEW REVIEW ON A PRODUCT =============
 
 productsRouter.post('/:productId', async (req, res, next) => {
     try {
-        const commentToInsert = {...req.body, createdAt: new Date(), updatedAt: new Date()}
+        const reviewToInsert = {...req.body, createdAt: new Date() }
 
         const productId = req.params.productId
-        const updatedProduct = await ProductModel.findByIdAndUpdate(productId, { $push: {comments: commentToInsert}}, { new: true, runValidators: true })
+        const updatedProduct = await ProductModel.findByIdAndUpdate(productId, { $push: {reviews: reviewToInsert}}, { new: true, runValidators: true })
 
         if(updatedProduct) {
             res.send(updatedProduct)
@@ -109,12 +109,12 @@ productsRouter.post('/:productId', async (req, res, next) => {
         if(error.name === "validationError") {
             next(createError(400, error))
         } else {
-        next(createError(500, `An Error ocurred while creating a comment on product ID: ${req.params.productId}`))
+        next(createError(500, `An Error ocurred while creating a review on product ID: ${req.params.productId}`))
         }
     }
 })
 
-// =========  RETRIEVES A LIST OF COMMENTS FROM A PRODUCT =============
+// =========  RETRIEVES A LIST OF REVIEWS FROM A PRODUCT =============
 
 productsRouter.get('/:productId/reviews', async (req, res, next) => {
     try {
@@ -122,45 +122,45 @@ productsRouter.get('/:productId/reviews', async (req, res, next) => {
         const product = await ProductModel.findById(productId)
 
         if (product) {
-            res.send(product.comments)
+            res.send(product.reviews)
         } else {
             next(createError(404, `Product with _id ${productId} Not Found!`))
         }
     } catch (error) {
-        next(createError(500, "An Error ocurred while getting the list of comments"))
+        next(createError(500, "An Error ocurred while getting the list of reviews"))
     }
 })
 
-// =========  RETRIEVES A SINGLE COMMENT FROM A PRODUCT =============
+// =========  RETRIEVES A SINGLE REVIEW FROM A PRODUCT =============
 
-productsRouter.get('/:productId/reviews/:commentId', async (req, res, next) => {
+productsRouter.get('/:productId/reviews/:reviewId', async (req, res, next) => {
     try {
         const productId = req.params.productId
-        const commentId = req.params.commentId
-        const productComment = await ProductModel.findById(productId, { comments: { $elemMatch: { _id: commentId}}})
+        const reviewId = req.params.reviewId
+        const productReview = await ProductModel.findById(productId, { reviews: { $elemMatch: { _id: reviewId}}})
         
-        if (productComment) {
-            if (productComment.comments.length > 0) {
-                res.send(productComment.comments[0])
+        if (productReview) {
+            if (productReview.reviews.length > 0) {
+                res.send(productReview.reviews[0])
             } else {
-                next(createError(404, `Comment with _id ${commentId} Not Found!`))
+                next(createError(404, `Review with _id ${reviewId} Not Found!`))
             }
 
         } else {
             next(createError(404, `Product with _id ${productId} Not Found!`))
         }
     } catch (error) {
-        next(createError(500, `An Error ocurred while getting comment with ID: ${req.params.commentId}`))
+        next(createError(500, `An Error ocurred while getting review with ID: ${req.params.reviewId}`))
     }
 })
 
-// =========  DELETES A COMMENT FROM A PRODUCT =============
+// =========  DELETES A REVIEW FROM A PRODUCT =============
 
-productsRouter.delete('/:productId/reviews/:commentId', async (req, res, next) => {
+productsRouter.delete('/:productId/reviews/:reviewId', async (req, res, next) => {
     try {
         const productId = req.params.productId
-        const commentId = req.params.commentId
-        const product = await ProductModel.findByIdAndUpdate(productId, { $pull: { comments: {_id: commentId}}}, { new: true })
+        const reviewId = req.params.reviewId
+        const product = await ProductModel.findByIdAndUpdate(productId, { $pull: { reviews: {_id: reviewId}}}, { new: true })
 
         if (product) {
             res.send(product)
@@ -168,20 +168,22 @@ productsRouter.delete('/:productId/reviews/:commentId', async (req, res, next) =
             next(createError(404, `Product with _id ${productId} Not Found!`))
         }
     } catch (error) {
-        next(createError(500, `An Error ocurred while deleting comment with ID: ${req.params.commentId}`))
+        next(createError(500, `An Error ocurred while deleting review with ID: ${req.params.reviewId}`))
     }
 })
 
-// =========  UPDATES A COMMENT ON A PRODUCT =============
+// =========  UPDATES A REVIEW ON A PRODUCT =============
 
-productsRouter.put('/:productId/reviews/:commentId', async (req, res, next) => {
+productsRouter.put('/:productId/reviews/:reviewId', async (req, res, next) => {
     try {
         const productId = req.params.productId
-        const commentId = req.params.commentId
+        const reviewId = req.params.reviewId
+
+        const updatedReview = {_id: reviewId, ...req.body, createdAt: new Date()}
 
         const product = await ProductModel.findOneAndUpdate( 
-            { _id: productId , "comments._id": commentId, }, 
-            { $set: { "comments.$": req.body, }}, 
+            { _id: productId , "reviews._id": reviewId, }, 
+            { $set: { "reviews.$": updatedReview }}, 
             { new: true, runValidators: true, }
         )
         if (product) {
@@ -190,7 +192,7 @@ productsRouter.put('/:productId/reviews/:commentId', async (req, res, next) => {
             next(createError(404, `Product with _id ${productId} Not Found!`))
         }
     } catch (error) {
-        next(createError(500, `An Error ocurred while updating comment with ID: ${req.params.commentId}`))
+        next(createError(500, `An Error ocurred while updating review with ID: ${req.params.reviewId}`))
     }
 })
 export default productsRouter
