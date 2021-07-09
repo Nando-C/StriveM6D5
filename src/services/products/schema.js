@@ -28,6 +28,20 @@ const ProductSchema = new Schema (
             type: String,
             required: true
         },
+        comments: [
+            {
+                comment: {
+                    type: String,
+                    required: true,
+                },
+                rate: {
+                    type: Number,
+                    required: true,
+                    min: 1,
+                    max: 5,
+                }
+            }
+        ]
     },
     {
         timestamps: true,
