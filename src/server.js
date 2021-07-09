@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 import { badRequestMiddleware, catchAllErrorsMiddleware, notFoundMiddleware } from './errorMiddlewares.js'
 import productsRouter from './services/products/index.js'
 import usersRouter from './services/users/index.js'
+import cartsRouter from './services/carts/index.js'
 
 
 const port = process.env.PORT || 3001
@@ -18,6 +19,7 @@ server.use(express.json())
 // ===================== ROUTES  =================================
 server.use("/products", productsRouter)
 server.use("/users", usersRouter)
+server.use("/carts", cartsRouter)
 // ===================== ERROR HANDLERS ==========================
 server.use(notFoundMiddleware)
 server.use(badRequestMiddleware)
