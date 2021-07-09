@@ -48,4 +48,14 @@ const ProductSchema = new Schema (
     }
 )
 
- export default model('Product', ProductSchema)
+ProductSchema.static('findProducts', async function (query) {
+    const total = await this.countDocuments(query.criteria)
+    const products = await this.find(query.criteria, query.options.fields)
+        .skip(query.options.skip)
+        .limit(query.options.limit)
+        .sort(query.options.sort)
+
+    return { total, products }
+})
+
+export default model('Product', ProductSchema)

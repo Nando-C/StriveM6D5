@@ -1,6 +1,7 @@
 import express from 'express'
 import ProductModel from './schema.js'
 import createError from 'http-errors'
+import q2m from 'query-to-mongo'
 
 const productsRouter = express.Router()
 
@@ -25,8 +26,11 @@ productsRouter.post('/', async (req, res, next) => {
 // ===============  RETURNS PRODUCT LIST =======================
 productsRouter.get('/', async (req, res, next) => {
     try {
-        const products = await ProductModel.find()
-        res.send(products)
+        const query = q2m(req.query)
+
+        const { total, products } = await ProductModel.findProducts(query)
+
+        res.send({ links: query.links('/products', total), total, products })
     } catch (error) {
         next(createError(500, "An Error ocurred while getting the list of products"))
     }
@@ -112,7 +116,7 @@ productsRouter.post('/:productId', async (req, res, next) => {
 
 // =========  RETRIEVES A LIST OF COMMENTS FROM A PRODUCT =============
 
-productsRouter.get('/:productId/comments', async (req, res, next) => {
+productsRouter.get('/:productId/reviews', async (req, res, next) => {
     try {
         const productId = req.params.productId
         const product = await ProductModel.findById(productId)
@@ -129,7 +133,7 @@ productsRouter.get('/:productId/comments', async (req, res, next) => {
 
 // =========  RETRIEVES A SINGLE COMMENT FROM A PRODUCT =============
 
-productsRouter.get('/:productId/comments/:commentId', async (req, res, next) => {
+productsRouter.get('/:productId/reviews/:commentId', async (req, res, next) => {
     try {
         const productId = req.params.productId
         const commentId = req.params.commentId
@@ -152,7 +156,7 @@ productsRouter.get('/:productId/comments/:commentId', async (req, res, next) => 
 
 // =========  DELETES A COMMENT FROM A PRODUCT =============
 
-productsRouter.delete('/:productId/comments/:commentId', async (req, res, next) => {
+productsRouter.delete('/:productId/reviews/:commentId', async (req, res, next) => {
     try {
         const productId = req.params.productId
         const commentId = req.params.commentId
@@ -170,7 +174,7 @@ productsRouter.delete('/:productId/comments/:commentId', async (req, res, next) 
 
 // =========  UPDATES A COMMENT ON A PRODUCT =============
 
-productsRouter.put('/:productId/comments/:commentId', async (req, res, next) => {
+productsRouter.put('/:productId/reviews/:commentId', async (req, res, next) => {
     try {
         const productId = req.params.productId
         const commentId = req.params.commentId
