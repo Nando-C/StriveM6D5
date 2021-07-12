@@ -18,7 +18,7 @@ const ProductSchema = new Schema (
         },
         imageUrl: {
             type: String,
-            required: true
+            // required: true
         },
         price: {
             type: Number,

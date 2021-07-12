@@ -2,6 +2,7 @@ import express from 'express'
 import ProductModel from './schema.js'
 import createError from 'http-errors'
 import q2m from 'query-to-mongo'
+import { uploadOnCloudinary } from '../../settings/cloudinary.js'
 
 const productsRouter = express.Router()
 
@@ -84,6 +85,29 @@ productsRouter.delete('/:productId', async (req, res, next) => {
         }
     } catch (error) {
         next(createError(500, `An Error ocurred while deleting the product ${req.params.productId}`))
+    }
+})
+
+// ===============  UPLOADS IMAGE TO PRODUCT =======================
+
+productsRouter.post('/:productId/uploadImage', uploadOnCloudinary.single('imageUrl'), async (req, res,next) => {
+    try {
+        const productId = req.params.productId
+        // const product = await ProductModel.findById(productId)
+
+        const modifiedProduct = await ProductModel.findByIdAndUpdate(
+            productId, 
+            {imageUrl: req.file.path}, 
+            {new: true} 
+        )
+        if(modifiedProduct) {
+            res.send(modifiedProduct)
+        } else {
+            next(createError(404, `Product with _id ${productId} Not Found!`))
+        }
+    } catch (error) {
+        console.log(error)
+        next(createError(500, "An Error ocurred while uploading Image to product"))
     }
 })
 
